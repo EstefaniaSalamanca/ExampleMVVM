@@ -1,16 +1,34 @@
 package com.estefaniasalamanca.examplemvvm.data
 
-import com.estefaniasalamanca.examplemvvm.data.model.QuoteModel
-import com.estefaniasalamanca.examplemvvm.data.model.QuoteProvider
+import com.estefaniasalamanca.examplemvvm.data.database.dao.QuoteDao
+import com.estefaniasalamanca.examplemvvm.data.database.entities.QuoteEntity
 import com.estefaniasalamanca.examplemvvm.data.network.QuoteService
+import com.estefaniasalamanca.examplemvvm.domain.model.Quote
+import com.estefaniasalamanca.examplemvvm.domain.model.toDomain
+import javax.inject.Inject
 
-class QuoteRepository {
-    private val api = QuoteService()
+class QuoteRepository @Inject constructor(
+    private val api: QuoteService,
+    private val quoteDao: QuoteDao
 
-    suspend fun getAllQuotes():List<QuoteModel>{
+) {
+
+    suspend fun getAllQuotesFromApi(): List<Quote> {
         val response = api.getQuotes()
-        QuoteProvider.quotes = response
-        return response
+        return response.map { it.toDomain() }
+    }
+
+    suspend fun getAllQuotesFromDatabase(): List<Quote> {
+        val response = quoteDao.getAllQuotes()
+        return response.map { it.toDomain() }
+
+    }
+
+    suspend fun insertQuotes(quotes: List<QuoteEntity>) {
+
+    }
+    suspend fun clearQuotes(){
+        quoteDao.deleteAllQuotes()
     }
 
 }
