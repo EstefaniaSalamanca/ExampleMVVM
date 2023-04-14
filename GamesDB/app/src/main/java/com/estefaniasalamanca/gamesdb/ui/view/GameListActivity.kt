@@ -5,21 +5,20 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.widget.SearchView
 import com.estefaniasalamanca.gamesdb.core.RetrofitHelper.getRetrofit
-import com.estefaniasalamanca.gamesdb.data.network.GameApiClient
+import com.estefaniasalamanca.gamesdb.data.network.GameApiService
 
 
 import com.estefaniasalamanca.gamesdb.databinding.ActivityGameListBinding
-import com.estefaniasalamanca.gamesdb.domain.GetGameUseCase
-import com.estefaniasalamanca.gamesdb.ui.viewmodel.GameDataCount
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class GameListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGameListBinding
-    private lateinit var retrofit:Retrofit
+    private lateinit var retrofit: Retrofit
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,14 +45,15 @@ class GameListActivity : AppCompatActivity() {
     private fun searchByName(query: String) {
         CoroutineScope(Dispatchers.IO).launch {
 
-            val myResponse: Response<GameDataCount> =
-                retrofit.create(GameApiClient::class.java).getGames(query)
-            if (myResponse.isSuccessful){
-                Log.i("Estefania", "funciona")
-            }else{
-                Log.i("Estefania", "No funciona")
-            }
+            val myResponse= retrofit.create(GameApiService::class.java).getGames(query)
+
         }
+         fun getRetrofit(): Retrofit {
+            return Retrofit.Builder()
+                .baseUrl("https://api.rawg.io/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+         }
 
     }
 }
